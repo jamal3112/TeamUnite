@@ -1,0 +1,108 @@
+#%RAML 1.0
+title: Teamunite
+version: v1
+baseUri: https://api.teamunite.ru/{version}
+mediaType: application/json
+protocols: HTTPS
+
+types:
+  Message:
+    type: object
+    properties:
+      message: string
+    example: |
+      {
+        "message": "Что-то пошло не так, попробуйте позже"
+      }
+  Task:
+    type: object
+    properties:
+      _id: string
+      owner: string
+      title: string
+      groups: array
+      curators: array
+      retake: boolean
+      description: string
+      descriptionFile: string
+      deadline: datetime
+      comment: string
+      quantity: number
+      options: number
+      fields: array
+      marks: array
+      criteriaGroups: array
+      archive: boolean
+      createdAt: datetime
+      updatedAt: datetime
+    example: !include task.sample
+
+/auth:
+  description: Авторизация
+  /login:
+    post:
+      description: Вход в систему
+      body:
+        type: object
+        properties:
+          email: string
+          password: string
+        example: |
+          {
+            "email": "xozewitc@yandex.ru",
+            "password": "maxim1111"
+          }
+      responses:
+        200:
+          body:
+            type: object
+            properties:
+              accessToken: string
+            example: |
+              {
+                "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJsb2dpbiI6ImFkbWluIiwicGFzc3dvcmQiOiJhZG1pbiIsImlhdCI6MTYwNTY4NTQ0OCwiZXhwIjoxNjA2OTgxNDQ4fQ.xS9cWyMYFTOVixhSxqAnc63sgPCQ4hlKMWHWoE4BzcE"
+              }
+        400:
+          body:
+            type: Message
+/tasks:
+  description: Запросы для работы с заданиями
+  get:
+    description: Получение всех заданий куратора
+    headers:
+      Authorization: string
+    responses:
+      200:
+        body:
+          type: Task
+      400:
+        body:
+          type: Message
+  post:
+    description: Добавление задания
+    headers:
+      Authorization: string
+    body:
+      type: object
+      properties:
+        title: string
+        groups: array
+        curators: array
+        retake: boolean
+        description: string
+        descriptionFile: string
+        deadline: datetime
+        comment: string
+        quantity: number
+        options: number
+        fields: array
+        marks: array
+        criteriaGroups: array
+      example: !include ./create-task.sample
+    responses:
+      200:
+        body:
+          type: Task
+      400:
+        body:
+          type: Message
